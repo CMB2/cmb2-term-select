@@ -1,0 +1,25 @@
+{
+    "name": "jtsternberg/cmb2-term-select",
+    "description": "Special CMB2 Field that allows users to define an autocomplete text field for terms",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "jtsternberg",
+            "email": "justin@dsgnwrks.pro",
+            "homepage": "http://dsgnwrks.pro/",
+            "role": "Developer"
+        }
+    ],
+    "keywords": ["wordpress", "cmb2", "meta"],
+    "homepage": "https://github.com/jtsternberg/cmb2-term-select",
+    "support": {
+        "issues": "https://github.com/jtsternberg/cmb2-term-select/issues",
+        "source": "https://github.com/jtsternberg/cmb2-term-select"
+    },
+    "require": {
+        "php": ">=5.2"
+    },
+    "autoload": {
+        "files": ["cmb2-term-select.php"]
+    }
+}

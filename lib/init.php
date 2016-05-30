@@ -40,6 +40,8 @@ class CMB2_Term_Select {
 	protected function __construct() {
 		add_action( 'cmb2_render_term_select', array( $this, 'render_term_select_field' ), 10, 5 );
 		add_filter( 'cmb2_sanitize_term_select', array( $this, 'sanitize_value' ), 10, 5 );
+		add_filter( 'cmb2_override_meta_save', array( $this, 'maybe_set_term' ), 10, 4 );
+		add_filter( 'cmb2_override_meta_value', array( $this, 'maybe_get_term' ), 10, 4 );
 
 		// No need to make this endpoint discoverable. Knock Knock.
 		if ( isset( $_GET['cmb2-term-select'] ) ) {
@@ -136,7 +138,7 @@ class CMB2_Term_Select {
 	 */
 	function sanitize_value( $override_value, $value, $object_id, $args, $sanitizer ) {
 		// Clean up
-		$value = array_map( 'sanitize_text_field', $value );
+		$value = is_array( $value ) ? array_map( 'sanitize_text_field', $value ) : ( $value ? sanitize_text_field( $value ) : '' );
 
 		// No name/taxonomy, clear the value.
 		if ( empty( $value['name'] ) || empty( $value['taxonomy'] ) ) {
@@ -174,6 +176,49 @@ class CMB2_Term_Select {
 
 		// Return the sanitized/validated value.
 		return $value;
+	}
+
+	public function field_should_apply_term( CMB2_Field $field ) {
+		if ( 'term_select' !== $field->args( 'type' ) ) {
+			return false;
+		}
+
+		if ( ! isset( $field->args['apply_term'] ) ) {
+			return true;
+		}
+
+		return (bool) $field->args['apply_term'];
+	}
+
+	public function maybe_set_term( $null, $a, $field_args, $field ) {
+		if ( $this->field_should_apply_term( $field ) ) {
+
+			if ( isset( $a['value']['name'] ) ) {
+				wp_set_object_terms( $field->object_id, $a['value']['name'], $field->args( 'taxonomy' ) );
+			}
+
+			return true;
+		}
+
+		return $null;
+	}
+
+	public function maybe_get_term( $default, $object_id, $a, $field ) {
+		if ( $this->field_should_apply_term( $field ) ) {
+			$terms = get_the_terms( $object_id, $field->args( 'taxonomy' ) );
+
+			if ( isset( $terms[0] ) ) {
+				return array(
+					'name'     => $terms[0]->name,
+					'id'       => $object_id,
+					'taxonomy' => $field->args( 'taxonomy' ),
+				);
+			}
+
+			return '';
+		}
+
+		return $default;
 	}
 
 	/**

@@ -10,8 +10,9 @@ $cmb->add_field( array(
 	'desc'     => 'Type the name of the term and select from the options',
 	'type'     => 'term_select',
 	'taxonomy' => 'category',
+	// 'apply_term' => false, // If set to false, saves the term to meta instead of setting term on the object.
 	// 'attributes' => array(
-	// 	'data-min-length' => 2, // Override minimum lengthy
+	// 	'data-min-length' => 2, // Override minimum length
 	// 	'data-delay'      => 100, // Override delay
 	// ),
 ) );
